@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net/http"
-
 	"github.com/Shubhangcs/go-water-dispenser/controllers"
 	"github.com/Shubhangcs/go-water-dispenser/database"
 	"github.com/gorilla/mux"
@@ -31,7 +30,7 @@ func main(){
 
 
 	//Controllers Defination
-	controllers.ViewController(db.Connection , router)
+	controllers.QrController(db.Connection , router)
 
 
 	//Server Running Code

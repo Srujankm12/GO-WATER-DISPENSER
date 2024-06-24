@@ -7,6 +7,6 @@ import (
 )
 
 
-func ViewController(sql *sql.DB , router *mux.Router){
-
+func QrController(sql *sql.DB , router *mux.Router){
+	
 }

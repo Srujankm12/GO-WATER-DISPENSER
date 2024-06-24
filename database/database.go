@@ -3,6 +3,7 @@ package database
 import "database/sql"
 
 
+
 type databaseConnection struct{
 	Connection *sql.DB
 }
