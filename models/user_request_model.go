@@ -1,11 +1,14 @@
 package models
 
-type UserRequestModel struct{
+import "database/sql"
+
+type UserModel struct{
+	UserId string `json:"userid"`
 	Name string `json:"name"`
 	Phone string `json:"phone"`
 	QrId string `json:"qrid"`
 }
 
-type UserRequestRepository interface{
-	AddUserToDatabase(UserRequestModel) error
+type UserRepositoryInterface interface{
+	AddUserDetailsToDatabase(UserModel)(*sql.Rows , error)
 }

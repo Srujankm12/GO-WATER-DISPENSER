@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 	"net/http"
-	"github.com/Shubhangcs/go-water-dispenser/controllers"
 	"github.com/Shubhangcs/go-water-dispenser/database"
+	"github.com/Shubhangcs/go-water-dispenser/routes"
 	"github.com/gorilla/mux"
 )
 
@@ -24,16 +24,15 @@ import (
 	-> sql drivers
 */
 
-func main(){
+func main() {
 	db := database.NewDatabaseConnectionInstance()
 	router := mux.NewRouter()
 
-
 	//Controllers Defination
-	controllers.QrController(db.Connection , router)
-
+	routes.UserRouter(db.Connection, router)
 
 	//Server Running Code
 	var PORT string = ":8000"
-	log.Fatal(http.ListenAndServe(PORT , router))
+	log.Println("Server is running at PORT:", PORT)
+	log.Fatal(http.ListenAndServe(PORT, router))
 }
