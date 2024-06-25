@@ -1,52 +1,51 @@
 package repository
 
 import (
-	"context"
 	"database/sql"
-	"fmt"
+	"encoding/json"
+	// "fmt"
+	"io"
+	// "net/http"
 	"sync"
 
 	"github.com/Shubhangcs/go-water-dispenser/models"
 )
 
 type UserRepository struct {
-	Db *sql.DB
+	db *sql.DB
 	mut *sync.Mutex
 }
 
 func NewUserRepository(db *sql.DB , mut *sync.Mutex) *UserRepository {
 	return &UserRepository{
-		Db: db,
+		db: db,
 		mut: mut,
 	}
 }
 
-func (nr *UserRepository) AddUserDetailsToDatabase(usr models.UserModel)  error{
-	nr.mut.Lock()
-	_ , err := nr.Db.Exec("INSERT INTO transaction(userid,name,phone,qrid) VALUES($1,$2,$3,$4)", usr.UserId, usr.Name, usr.Phone, usr.QrId)
-	nr.mut.Unlock()
-	if err != nil {
-		return  err
-	}
-
-	return  nil
-}
-
-func (nr *UserRepository) LoginUser(usr models.UserModel)  error {
-	var ctx context.Context
+func (repo *UserRepository) RegisterUser(req *io.ReadCloser)  error {
 	var user models.UserModel
-	rows , err := nr.Db.QueryContext(ctx , "Select $1 , $2 FROM transaction" , usr.Name , usr.Phone)
-	if err != nil {
-		fmt.Println(err.Error())
+	data , readErr := io.ReadAll(*req)
+	if readErr != nil {
+		return readErr
 	}
-	rows.Close()
-	name := make([]models.UserModel , 0)
-	for rows.Next() {
-		if err := rows.Scan(&user); err != nil {
-			panic(err)
-		}
-		name = append(name, user)
+	unmarErr := json.Unmarshal(data , &user)
+	if unmarErr != nil {
+		return unmarErr
 	}
-	 fmt.Println(name)
+	_ , queryErr := repo.db.Exec("INSERT INTO users(userid,name,phone,qrid) VALUES($1,$2,$3,$4)", user.UserId, user.Name, user.Phone)
+	if queryErr != nil{
+		return queryErr
+	}
 	return nil
 }
+
+// func (repo *UserRepository) LoginUser(user *models.UserModel)  (bool , error) {
+// 	var userModel models.UserModel
+// 	rows := repo.db.QueryRow("Select * FROM transaction WHERE name=$1 AND phone=$2" , user.Name , user.Phone)
+// 	if err := rows.Scan( &userModel.UserId,&userModel.Name , &userModel.Phone); err != nil{
+// 		fmt.Println(err.Error())
+// 		return false , err
+// 	}
+// 	return true , nil
+// }
