@@ -1,7 +1,5 @@
 package models
 
-import "database/sql"
-
 type UserModel struct{
 	UserId string `json:"userid"`
 	Name string `json:"name"`
@@ -10,5 +8,6 @@ type UserModel struct{
 }
 
 type UserRepositoryInterface interface{
-	AddUserDetailsToDatabase(UserModel)(*sql.Rows , error)
+	AddUserDetailsToDatabase(UserModel) error
+	LoginUser(UserModel) error
 }

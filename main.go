@@ -3,6 +3,8 @@ package main
 import (
 	"log"
 	"net/http"
+	"sync"
+
 	"github.com/Shubhangcs/go-water-dispenser/database"
 	"github.com/Shubhangcs/go-water-dispenser/routes"
 	"github.com/gorilla/mux"
@@ -22,14 +24,16 @@ import (
 	-> gorilla mux
 	-> sql
 	-> sql drivers
+	-> sync
 */
 
 func main() {
 	db := database.NewDatabaseConnectionInstance()
 	router := mux.NewRouter()
+	mut := sync.Mutex{}
 
 	//Controllers Defination
-	routes.UserRouter(db.Connection, router)
+	routes.UserRouter(db.Connection, router , &mut)
 
 	//Server Running Code
 	var PORT string = ":8000"
