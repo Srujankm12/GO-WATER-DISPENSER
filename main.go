@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/Shubhangcs/go-water-dispenser/database"
+	"github.com/Shubhangcs/go-water-dispenser/middlewares"
 	"github.com/Shubhangcs/go-water-dispenser/routes"
 	"github.com/gorilla/mux"
 )
@@ -33,7 +34,9 @@ func main() {
 	mut := sync.Mutex{}
 
 	//Controllers Defination
-	routes.UserRouter(db.Connection, router , &mut)
+	router.Use(middlewares.LoggerMiddleware)
+	// router.Use(middlewares.AuthorizeUser)
+	routes.UserRouter(db.Connection, router, &mut)
 
 	//Server Running Code
 	var PORT string = ":8000"
