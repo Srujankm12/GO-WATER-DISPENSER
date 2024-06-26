@@ -39,7 +39,7 @@ func main() {
 
 	//Controllers to be used
 	routes.TransactionRouter(db.Db , &mut , router)
-	
+
 	//Server Listner Implamentation
 	var PORT string = ":8000"
 	log.Println("Server is running at PORT:", PORT)
