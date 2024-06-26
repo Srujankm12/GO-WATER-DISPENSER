@@ -30,7 +30,7 @@ import (
 
 func main() {
 	//Instance to be passed as dependency
-	db := database.NewDatabaseConnectionInstance()
+	db := database.NewConnection()
 	router := mux.NewRouter()
 	mut := sync.Mutex{}
 
@@ -38,8 +38,8 @@ func main() {
 	router.Use(middlewares.LoggerMiddleware)
 
 	//Controllers to be used
-	routes.UserRouter(db.Connection, router, &mut)
-
+	routes.TransactionRouter(db.Db , &mut , router)
+	
 	//Server Listner Implamentation
 	var PORT string = ":8000"
 	log.Println("Server is running at PORT:", PORT)

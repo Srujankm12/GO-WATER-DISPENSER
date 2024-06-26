@@ -2,19 +2,20 @@ package database
 
 import (
 	"database/sql"
+
 	_ "github.com/lib/pq"
 )
 
-type databaseConnection struct {
-	Connection *sql.DB
+type DbInstance struct {
+	Db *sql.DB
 }
 
-func NewDatabaseConnectionInstance() *databaseConnection {
+func NewConnection() *DbInstance {
 	db, err := sql.Open("postgres", "user=root dbname=water sslmode=disable password=password host=localhost")
 	if err != nil {
 		panic(err)
 	}
-	return &databaseConnection{
-		Connection: db,
+	return &DbInstance{
+		Db: db,
 	}
 }
