@@ -9,9 +9,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func TransactionRouter(sql *sql.DB , mut *sync.Mutex , router *mux.Router){
-	repo := repository.NewTransactionRepositoryInstance(sql , mut)
+func TransactionRouter(sql *sql.DB, mut *sync.Mutex, router *mux.Router) {
+	repo := repository.NewTransactionRepositoryInstance(sql, mut)
 	controller := controllers.NewTransactionControllerInstance(repo)
 
-	router.HandleFunc("/transaction" , controller.ConfirmTransactionImpl)
+	// Transaction confirmation route
+	router.HandleFunc("/transaction", controller.ConfirmTransactionImpl).Methods("POST")
+	//quantity
+	router.HandleFunc("/quantity", controller.GetQuantityImpl).Methods("GET")
 }

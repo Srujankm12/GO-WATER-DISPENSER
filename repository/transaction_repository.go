@@ -9,33 +9,42 @@ import (
 	"github.com/Shubhangcs/go-water-dispenser/models"
 )
 
-type TransactionRepository struct{
-	db *sql.DB
+type TransactionRepository struct {
+	db  *sql.DB
 	mut *sync.Mutex
 }
 
-func NewTransactionRepositoryInstance(db *sql.DB , mut *sync.Mutex) *TransactionRepository {
+func NewTransactionRepositoryInstance(db *sql.DB, mut *sync.Mutex) *TransactionRepository {
 	return &TransactionRepository{
-		db: db,
+		db:  db,
 		mut: mut,
 	}
 }
 
 func (tr *TransactionRepository) ConfirmTransaction(inp *io.ReadCloser) error {
-	data , readErr := io.ReadAll(*inp)
+	data, readErr := io.ReadAll(*inp)
 	if readErr != nil {
 		return readErr
 	}
 	var transaction models.Transaction
-	convErr := json.Unmarshal(data , &transaction)
-	if convErr != nil{
+	convErr := json.Unmarshal(data, &transaction)
+	if convErr != nil {
 		return convErr
 	}
 	tr.mut.Lock()
-	_ , dbErr := tr.db.Exec("INSERT INTO transactions(qrid , quantity , amount , reciptno) VALUES($1 , $2 , $3 , $4)" , transaction.QrId , transaction.NoOfLiters , transaction.Ammount , transaction.ReciptNo)
+	_, dbErr := tr.db.Exec("INSERT INTO transactions(qrid, quantity, amount, reciptno) VALUES($1, $2, $3, $4)", transaction.QrId, transaction.NoOfLiters, transaction.Ammount, transaction.ReciptNo)
 	tr.mut.Unlock()
 	if dbErr != nil {
 		return dbErr
 	}
 	return nil
+}
+
+func (tr *TransactionRepository) GetQuantity() (int, error) {
+	var quantity int
+	err := tr.db.QueryRow("SELECT SUM(quantity) FROM transactions").Scan(&quantity)
+	if err != nil {
+		return 0, err
+	}
+	return quantity, nil
 }

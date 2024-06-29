@@ -1,9 +1,12 @@
 package models
 
-type ErrorPayload struct{
+type ErrorPayload struct {
 	Message string `json:"message"`
 }
 
-type SuccessPayload struct{
+type SuccessPayload struct {
 	Message string `json:"message"`
+}
+type QuantityResponse struct {
+	Quantity int `json:"quantity"`
 }

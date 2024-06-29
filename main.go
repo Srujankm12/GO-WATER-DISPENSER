@@ -6,42 +6,34 @@ import (
 	"sync"
 
 	"github.com/Shubhangcs/go-water-dispenser/database"
-	"github.com/Shubhangcs/go-water-dispenser/middlewares"
 	"github.com/Shubhangcs/go-water-dispenser/routes"
 	"github.com/gorilla/mux"
 )
 
-// This project Mainly Created for a water Dispenser Machine server implementation
-// for more info visit: https://github.com/Shubhangcs/go-water-dispenser
-
-//Packages to be used
-
-/*
-	-> fmt
-	-> log
-	-> net/http
-	-> json
-	-> strings
-	-> gorilla mux
-	-> sql
-	-> sql drivers
-	-> sync
-*/
-
 func main() {
-	//Instance to be passed as dependency
-	db := database.NewConnection()
+	// Initialize database connection
+	db := database.NewConnection().Db
+	defer db.Close()
+
+	// Create a mutex for handling concurrent database access
+	var mut sync.Mutex
+
+	// Create a new router instance
 	router := mux.NewRouter()
-	mut := sync.Mutex{}
 
-	//Middlewares to be used
-	router.Use(middlewares.LoggerMiddleware)
+	// Logger middleware (if needed)
+	// router.Use(middlewares.LoggerMiddleware)
 
-	//Controllers to be used
-	routes.TransactionRouter(db.Db , &mut , router)
+	// Setup routes
+	routes.TransactionRouter(db, &mut, router)
 
-	//Server Listner Implamentation
-	var PORT string = ":8000"
-	log.Println("Server is running at PORT:", PORT)
-	log.Fatal(http.ListenAndServe(PORT, router))
+	// Serve static files if needed
+	// router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+
+	// Start the HTTP server
+	port := ":8080"
+	log.Printf("Server listening on port %s", port)
+	if err := http.ListenAndServe(port, router); err != nil {
+		log.Fatalf("Error starting server: %s", err)
+	}
 }
