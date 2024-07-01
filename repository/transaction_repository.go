@@ -3,7 +3,9 @@ package repository
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io"
+	"strings"
 	"sync"
 
 	"github.com/Shubhangcs/go-water-dispenser/models"
@@ -39,12 +41,26 @@ func (tr *TransactionRepository) ConfirmTransaction(inp *io.ReadCloser) error {
 	}
 	return nil
 }
-
-func (tr *TransactionRepository) GetQuantity() (int, error) {
-	var quantity int
-	err := tr.db.QueryRow("SELECT SUM(quantity) FROM transactions").Scan(&quantity)
+func (tr *TransactionRepository) GetQuantity() (string, error) {
+	var quantities []int
+	rows, err := tr.db.Query("SELECT quantity FROM transactions")
 	if err != nil {
-		return 0, err
+		return "", err
 	}
-	return quantity, nil
+	defer rows.Close()
+
+	for rows.Next() {
+		var quantity int
+		if err := rows.Scan(&quantity); err != nil {
+			return "", err
+		}
+		quantities = append(quantities, quantity)
+	}
+
+	var strQuantities []string
+	for _, quantity := range quantities {
+		strQuantities = append(strQuantities, fmt.Sprintf("%d", quantity))
+	}
+	result := strings.Join(strQuantities, ",")
+	return result, nil
 }

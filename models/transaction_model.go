@@ -11,5 +11,5 @@ type Transaction struct {
 
 type TransactionInterface interface {
 	ConfirmTransaction(inp *io.ReadCloser) error
-	GetQuantity() (int, error)
+	GetQuantity() (string, error)
 }
